@@ -14,7 +14,7 @@ const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
-app.post('/addEmpTimeSheet', async (req, res) => {    
+app.post('/submitTimeSheet', async (req, res) => {    
  await prisma.employee.create({
     data:{
      name:req.body.name,
@@ -66,31 +66,7 @@ app.post('/addEmpTimeSheet', async (req, res) => {
   }
 });
 
-// app.get('/getEmpDetails',async(req,res)=>{
-//   try {
-  
-//     console.log('called getEmpDetails:', req.query)
-//     const empTimeSheetDetails= await prisma.timesheet.findFirst({
-//       where:{id:Number(req.query.id)},
-     
-//     })
-//     console.log('empTimeSheetDetails',empTimeSheetDetails);
-//     if(empTimeSheetDetails?.authorId){
-//       const empdata=await prisma.employee.findFirst({
-//         where:{id:Number(empTimeSheetDetails?.authorId)},
-       
-//       })
-//       empTimeSheetDetails.daterange=empdata?.daterange;
-//     }
-//     res.status(200).json(empTimeSheetDetails);
-//   } catch (error) {
-//     console.log(error);
-//     res
-//         .status(500)
-//         .json({ success: false, message: "Error listing employeedata" });
-//   }
-// });
-app.put("/timesheetActivity", async (req, res) => {
+app.put("/statusChange", async (req, res) => {
   console.log('timedata',req?.body); 
   try{
     const  updateStatus = async (id, check) => {
