@@ -14,12 +14,8 @@ const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
-app.post('/addEmpTimeSheet', async (req, res) => {
-    const{ name,daterange,timesheetsRows,totalhours} =req.body;
- 
- console.log('name',name,'daterange',daterange,'timesheetsRows',timesheetsRows,'totalhours',totalhours)
- 
- const job = await prisma.employee.create({
+app.post('/addEmpTimeSheet', async (req, res) => {    
+ await prisma.employee.create({
     data:{
      name:req.body.name,
      daterange:req.body.daterange,
@@ -32,27 +28,24 @@ app.post('/addEmpTimeSheet', async (req, res) => {
      }
     }
   });
-  console.log(job);
-//  res.json(job);
+ 
  res.json({status:200,message:'created successfully'})
-//  return true;
+
      
  });
 
  app.get("/getdata", async (req, res) => {
   try {
-    const getdetails = await prisma.employee.findMany({
-      // where:{status:{
-      //   notIn:['approve','rejected']
-      // }},
+    // await prisma.employee.deleteMany({})
+    // await prisma.timesheet.deleteMany({})
+    const getdetails = await prisma.employee.findMany({     
       include : {
         timesheetsRows : true
       }
     });
     let mainArr=[];
       for (let index = 0; index < getdetails.length; index++) {
-        const element = getdetails[index];
-        console.log('ele',element);
+        const element = getdetails[index];      
             element.timesheetsRows.map(ele=>{
             ele.daterange=element.daterange
             if(ele.status!= 'approve' && ele.status!= 'rejected' ){
@@ -63,9 +56,8 @@ app.post('/addEmpTimeSheet', async (req, res) => {
         
        
       }
-      console.log('mainArr',mainArr);
-      res.status(201).json(mainArr);
-    // res.status(201).json(getdetails);
+    
+      res.status(201).json(mainArr);    
   } catch (error) {
     res
       .status(500)
@@ -99,25 +91,24 @@ app.get('/getEmpDetails',async(req,res)=>{
   }
 });
 app.put("/timesheetActivity", async (req, res) => {
+  console.log('timedata',req?.body);
+  var updated;
   try{
-    console.log('timedata',req?.body);
-    for(i=0; i< req.body; i++) {
-
-await prisma.timesheet.update(
-      {
-        where: { id: Number(req?.body[i].id) },
-        data: { "status": req?.body[i].status }
-      })
-    }
-    const getAllUpdated = await prisma.timesheet.findMany({});
-      
+    const  updateStatus = async (id, check) => {
+      return  await prisma.timesheet.update(
+        {
+          where: { id: id },
+          data: { "status": check }
+        })
+      }
+  
+    const results = await Promise.all(
+      req?.body.map(obj => updateStatus(parseInt(obj.id), obj.status)) 
+    )
+        const getAllUpdated = await prisma.timesheet.findMany({});
     
-    // const Resp = await prisma.timesheet.update(
-    //   {
-    //     where: { id: Number(req?.body?.id) },
-    //     data: { "status": req?.body.status }
-    //   })
     console.log('resp:',getAllUpdated);
+    console.log("results",results);
     res.status(200).json(getAllUpdated);
     
   }
@@ -128,29 +119,10 @@ await prisma.timesheet.update(
       .json({ success: false, message: "Error listing employeedata" });
     console.error("Error creating user:", error);
   }
- 
+  
 });
 
 
-// app.post("/addEmpTimeSheet", async (req, res) => {
-//     const { name,daterange,timesheetsRows } = req.body;
-//     try {
-//       const job = await prisma.employee.create({
-//         data: {
-//           name,
-//           daterange,
-//           timesheetsRows,
-//         },
-//       });
-//       console.log(job);
-//       res.status(201).json({ success: true, message: "EmployeeData Created" });
-//     } catch (error) {
-//       res
-//         .status(500)
-//         .json({ success: false, message: "Error creating EmployeeData" });
-//       console.error("Error creating user:", error);
-//     }
-//   });
 
   app.listen(port, () => {
     console.log("Server is running on port", port);
