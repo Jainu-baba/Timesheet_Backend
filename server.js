@@ -66,33 +66,32 @@ app.post('/addEmpTimeSheet', async (req, res) => {
   }
 });
 
-app.get('/getEmpDetails',async(req,res)=>{
-  try {
+// app.get('/getEmpDetails',async(req,res)=>{
+//   try {
   
-    console.log('called getEmpDetails:', req.query)
-    const empTimeSheetDetails= await prisma.timesheet.findFirst({
-      where:{id:Number(req.query.id)},
+//     console.log('called getEmpDetails:', req.query)
+//     const empTimeSheetDetails= await prisma.timesheet.findFirst({
+//       where:{id:Number(req.query.id)},
      
-    })
-    console.log('empTimeSheetDetails',empTimeSheetDetails);
-    if(empTimeSheetDetails?.authorId){
-      const empdata=await prisma.employee.findFirst({
-        where:{id:Number(empTimeSheetDetails?.authorId)},
+//     })
+//     console.log('empTimeSheetDetails',empTimeSheetDetails);
+//     if(empTimeSheetDetails?.authorId){
+//       const empdata=await prisma.employee.findFirst({
+//         where:{id:Number(empTimeSheetDetails?.authorId)},
        
-      })
-      empTimeSheetDetails.daterange=empdata?.daterange;
-    }
-    res.status(200).json(empTimeSheetDetails);
-  } catch (error) {
-    console.log(error);
-    res
-        .status(500)
-        .json({ success: false, message: "Error listing employeedata" });
-  }
-});
+//       })
+//       empTimeSheetDetails.daterange=empdata?.daterange;
+//     }
+//     res.status(200).json(empTimeSheetDetails);
+//   } catch (error) {
+//     console.log(error);
+//     res
+//         .status(500)
+//         .json({ success: false, message: "Error listing employeedata" });
+//   }
+// });
 app.put("/timesheetActivity", async (req, res) => {
-  console.log('timedata',req?.body);
-  var updated;
+  console.log('timedata',req?.body); 
   try{
     const  updateStatus = async (id, check) => {
       return  await prisma.timesheet.update(
