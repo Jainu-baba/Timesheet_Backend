@@ -15,6 +15,7 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 app.post('/updateTimeSheet', async (req, res) => {
+  console.log("update", req?.body.timesheetsRows);
   try {
     const updateStatus = async (id, obj) => {
       return await prisma.timesheet.update(
@@ -92,10 +93,8 @@ app.get("/getdata", async (req, res) => {
       const element = getdetails[index];
       element.timesheetsRows.map(ele => {
         ele.daterange = element.daterange
-        if (ele.status != 'approve') {
           ele.name = element.name
           mainArr.push(ele);
-        }
       })
 
 
